@@ -18,4 +18,17 @@ describe('Scraper', () => {
     await scraper.navigate(url);
     expect(mockPage.goto).toHaveBeenCalledWith(url);
   });
+
+  it('should wait for a random duration within a range', async () => {
+    // We'll mock waitForTimeout on the page
+    const waitForTimeoutMock = jest.fn();
+    (mockPage as any).waitForTimeout = waitForTimeoutMock;
+
+    await scraper.wait(100, 200);
+
+    expect(waitForTimeoutMock).toHaveBeenCalled();
+    const delay = waitForTimeoutMock.mock.calls[0][0];
+    expect(delay).toBeGreaterThanOrEqual(100);
+    expect(delay).toBeLessThanOrEqual(200);
+  });
 });
