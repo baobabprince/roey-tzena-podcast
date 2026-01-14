@@ -8,7 +8,7 @@
 
 ## Phase 2: Scraper Development
 - [x] Task: Implement basic navigation to Facebook target page. (ec4b587)
-- [ ] Task: Write tests for post and comment extraction logic.
+- [x] Task: Write tests for post and comment extraction logic. (f231ea5)
 - [ ] Task: Implement logic to identify and extract audio links from comments.
 - [ ] Task: Implement basic rate-limiting and human-mimicry delays.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md)
