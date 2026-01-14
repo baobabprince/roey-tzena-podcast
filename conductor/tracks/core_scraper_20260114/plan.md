@@ -3,7 +3,7 @@
 ## Phase 1: Project Initialization & Environment Setup
 - [x] Task: Initialize Node.js project with TypeScript. (66cd413)
 - [x] Task: Configure Playwright/Puppeteer for headless scraping. (30dc893)
-- [ ] Task: Set up basic project structure (src/scraper, src/feed, src/storage).
+- [x] Task: Set up basic project structure (src/scraper, src/feed, src/storage). (414a4ba)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Initialization & Environment Setup' (Protocol in workflow.md)
 
 ## Phase 2: Scraper Development
