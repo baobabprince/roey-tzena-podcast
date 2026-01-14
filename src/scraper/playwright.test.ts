@@ -5,5 +5,5 @@ describe('Playwright Configuration', () => {
     const browser = await chromium.launch({ headless: true });
     expect(browser).toBeDefined();
     await browser.close();
-  });
+  }, 30000);
 });
