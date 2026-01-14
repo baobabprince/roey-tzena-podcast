@@ -1,0 +1,8 @@
+{
+  "track_id": "core_scraper_20260114",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-14T12:00:00Z",
+  "updated_at": "2026-01-14T12:00:00Z",
+  "description": "Build the core scraper and RSS generator to extract audio links from Roey Tzezana's Facebook page and serve a standard podcast feed."
+}

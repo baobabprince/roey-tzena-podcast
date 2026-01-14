@@ -1,0 +1,26 @@
+# Plan: Core Scraper and RSS Generator
+
+## Phase 1: Project Initialization & Environment Setup
+- [ ] Task: Initialize Node.js project with TypeScript.
+- [ ] Task: Configure Playwright/Puppeteer for headless scraping.
+- [ ] Task: Set up basic project structure (src/scraper, src/feed, src/storage).
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Initialization & Environment Setup' (Protocol in workflow.md)
+
+## Phase 2: Scraper Development
+- [ ] Task: Implement basic navigation to Facebook target page.
+- [ ] Task: Write tests for post and comment extraction logic.
+- [ ] Task: Implement logic to identify and extract audio links from comments.
+- [ ] Task: Implement basic rate-limiting and human-mimicry delays.
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md)
+
+## Phase 3: Storage and RSS Generation
+- [ ] Task: Implement JSON-based metadata storage for processed posts.
+- [ ] Task: Write tests for RSS feed generation.
+- [ ] Task: Implement audio file downloading and local serving logic.
+- [ ] Task: Integrate scraper with feed generator to produce a valid `podcast.xml`.
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: Storage and RSS Generation' (Protocol in workflow.md)
+
+## Phase 4: Integration and Deployment Readiness
+- [ ] Task: Create a main entry point to run the full scrape-and-generate cycle.
+- [ ] Task: Configure a GitHub Action workflow for scheduled execution.
+- [ ] Task: Conductor - User Manual Verification 'Phase 4: Integration and Deployment Readiness' (Protocol in workflow.md)
