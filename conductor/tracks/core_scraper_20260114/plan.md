@@ -1,7 +1,7 @@
 # Plan: Core Scraper and RSS Generator
 
 ## Phase 1: Project Initialization & Environment Setup
-- [ ] Task: Initialize Node.js project with TypeScript.
+- [x] Task: Initialize Node.js project with TypeScript. (66cd413)
 - [ ] Task: Configure Playwright/Puppeteer for headless scraping.
 - [ ] Task: Set up basic project structure (src/scraper, src/feed, src/storage).
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Initialization & Environment Setup' (Protocol in workflow.md)
