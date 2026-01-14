@@ -7,7 +7,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Project Initialization & Environment Setup' (Protocol in workflow.md) (2ae6516)
 
 ## Phase 2: Scraper Development
-- [ ] Task: Implement basic navigation to Facebook target page.
+- [x] Task: Implement basic navigation to Facebook target page. (ec4b587)
 - [ ] Task: Write tests for post and comment extraction logic.
 - [ ] Task: Implement logic to identify and extract audio links from comments.
 - [ ] Task: Implement basic rate-limiting and human-mimicry delays.
