@@ -10,8 +10,8 @@
 - [x] Task: Implement basic navigation to Facebook target page. (ec4b587)
 - [x] Task: Write tests for post and comment extraction logic. (f231ea5)
 - [x] Task: Implement logic to identify and extract audio links from comments. (565dfb1)
-- [ ] Task: Implement basic rate-limiting and human-mimicry delays.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md)
+- [x] Task: Implement basic rate-limiting and human-mimicry delays. (545f05b)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md)
 
 ## Phase 3: Storage and RSS Generation
 - [ ] Task: Implement JSON-based metadata storage for processed posts.
