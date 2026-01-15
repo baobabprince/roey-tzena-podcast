@@ -14,8 +14,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md) (03715ae)
 
 ## Phase 3: Storage and RSS Generation
-- [~] Task: Implement JSON-based metadata storage for processed posts.
-- [ ] Task: Write tests for RSS feed generation.
+- [x] Task: Implement JSON-based metadata storage for processed posts. (c024f1e)
+- [~] Task: Write tests for RSS feed generation.
 - [ ] Task: Implement audio file downloading and local serving logic.
 - [ ] Task: Integrate scraper with feed generator to produce a valid `podcast.xml`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Storage and RSS Generation' (Protocol in workflow.md)
