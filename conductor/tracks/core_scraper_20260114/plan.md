@@ -16,8 +16,8 @@
 ## Phase 3: Storage and RSS Generation
 - [x] Task: Implement JSON-based metadata storage for processed posts. (c024f1e)
 - [x] Task: Write tests for RSS feed generation. (9cbc0b4)
-- [~] Task: Implement audio file downloading and local serving logic.
-- [ ] Task: Integrate scraper with feed generator to produce a valid `podcast.xml`.
+- [x] Task: Implement audio file downloading and local serving logic. (62fca59)
+- [~] Task: Integrate scraper with feed generator to produce a valid `podcast.xml`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Storage and RSS Generation' (Protocol in workflow.md)
 
 ## Phase 4: Integration and Deployment Readiness
