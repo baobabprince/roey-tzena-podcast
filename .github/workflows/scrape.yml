@@ -1,0 +1,41 @@
+name: Scrape and Update Podcast
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Scraper
+        run: npm start
+        env:
+          FACEBOOK_URL: ${{ secrets.FACEBOOK_URL || 'https://www.facebook.com/roey.tzezana' }}
+          BASE_URL: 'https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/audio/'
+          DATA_DIR: 'public'
+          RSS_OUTPUT: 'public/podcast.xml'
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true # Important to keep old audio files
