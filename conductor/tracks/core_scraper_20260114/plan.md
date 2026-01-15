@@ -22,5 +22,5 @@
 
 ## Phase 4: Integration and Deployment Readiness
 - [x] Task: Create a main entry point to run the full scrape-and-generate cycle. (7eb4310)
-- [~] Task: Configure a GitHub Action workflow for scheduled execution.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Integration and Deployment Readiness' (Protocol in workflow.md)
+- [x] Task: Configure a GitHub Action workflow for scheduled execution. (bd72bc4)
+- [~] Task: Conductor - User Manual Verification 'Phase 4: Integration and Deployment Readiness' (Protocol in workflow.md)
