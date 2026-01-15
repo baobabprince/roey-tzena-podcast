@@ -13,4 +13,6 @@ export interface Post {
   url: string;
   comments: Comment[];
   audioUrl?: string;
+  title?: string;
+  sourceUrl?: string;
 }

@@ -11,7 +11,11 @@ export class Storage {
     }
     const data = await fs.readFile(this.dbPath, 'utf-8');
     try {
-      return JSON.parse(data);
+      const posts = JSON.parse(data);
+      return posts.map((p: any) => ({
+        ...p,
+        date: new Date(p.date)
+      }));
     } catch (e) {
       console.error('Error parsing storage file, returning empty array.', e);
       return [];

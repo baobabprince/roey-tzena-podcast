@@ -7,7 +7,7 @@ describe('RSS Generation', () => {
       {
         id: 'post-1',
         text: 'Description of the post',
-        date: '2026-01-15T10:00:00Z',
+        date: new Date('2026-01-15T10:00:00Z'),
         url: 'https://facebook.com/post1',
         comments: [],
         audioUrl: 'https://example.com/audio1.mp3'
@@ -45,7 +45,7 @@ describe('RSS Generation', () => {
       {
         id: 'post-1',
         text: 'A'.repeat(200),
-        date: '2026-01-15T10:00:00Z',
+        date: new Date('2026-01-15T10:00:00Z'),
         url: 'https://facebook.com/post1',
         comments: [],
         audioUrl: 'https://example.com/audio1.mp3'
@@ -54,5 +54,28 @@ describe('RSS Generation', () => {
     const rss = await generateRss(posts, { title: 'T', description: 'D', siteUrl: 'S', author: 'A' });
     // Title should be a subset of the long text
     expect(rss).toContain('<title>' + 'A'.repeat(100)); 
+  });
+
+  it('should use post title if provided', async () => {
+    const posts: Post[] = [
+      {
+        id: 'post-1',
+        text: 'Description of the post',
+        date: new Date('2026-01-15T10:00:00Z'),
+        url: 'https://facebook.com/post1',
+        comments: [],
+        audioUrl: 'https://example.com/audio1.mp3',
+        title: 'Custom NotebookLM Title'
+      }
+    ];
+
+    const rss = await generateRss(posts, {
+      title: 'Roey Tzezana Podcast',
+      description: 'D',
+      siteUrl: 'S',
+      author: 'A'
+    });
+
+    expect(rss).toContain('<title>Custom NotebookLM Title</title>');
   });
 });

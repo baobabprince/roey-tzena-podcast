@@ -9,7 +9,7 @@ export interface FeedConfig {
 
 export async function generateRss(posts: Post[], config: FeedConfig): Promise<string> {
   const items = posts.map(post => {
-    const title = post.text.slice(0, 100).replace(/[<>&"']/g, ''); // Simple escape
+    const title = (post.title || post.text.slice(0, 100)).replace(/[<>&"']/g, ''); // Simple escape
     const description = post.text.replace(/[<>&"']/g, '');
     const date = new Date(post.date).toUTCString();
     
