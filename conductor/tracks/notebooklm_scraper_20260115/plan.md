@@ -9,7 +9,7 @@ This plan outlines the steps to enhance the scraper to extract audio links from 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Type Updates & Infrastructure' (Protocol in workflow.md) (a010c2c)
 
 ## Phase 2: NotebookLM Deep Scraper (TDD)
-- [ ] Task: Create `src/scraper/notebooklm.ts` for specialized NotebookLM extraction.
+- [x] Task: Create `src/scraper/notebooklm.ts` for specialized NotebookLM extraction. (2d4d5e2)
 - [ ] Task: Write failing tests for `extractAudioFromNotebookLM`.
     - [ ] Test successful extraction of audio URL and title from a mock NotebookLM page.
     - [ ] Test retry logic on failure.
