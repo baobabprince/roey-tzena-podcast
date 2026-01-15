@@ -2,11 +2,11 @@
 
 This plan outlines the steps to enhance the scraper to extract audio links from NotebookLM pages linked in the first comment of Facebook posts.
 
-## Phase 1: Type Updates & Infrastructure
+## Phase 1: Type Updates & Infrastructure [checkpoint: a010c2c]
 - [x] Task: Update `Post` and `Comment` types to include NotebookLM-specific metadata. (d68ff7c)
     - [x] Add `title` and `sourceUrl` (the NotebookLM link) to `Post`.
     - [x] Update any existing mocks or tests to reflect type changes.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Type Updates & Infrastructure' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Type Updates & Infrastructure' (Protocol in workflow.md) (a010c2c)
 
 ## Phase 2: NotebookLM Deep Scraper (TDD)
 - [ ] Task: Create `src/scraper/notebooklm.ts` for specialized NotebookLM extraction.
