@@ -6,15 +6,15 @@
 - [x] Task: Set up basic project structure (src/scraper, src/feed, src/storage). (414a4ba)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Project Initialization & Environment Setup' (Protocol in workflow.md) (2ae6516)
 
-## Phase 2: Scraper Development
+## Phase 2: Scraper Development [checkpoint: c2e9245]
 - [x] Task: Implement basic navigation to Facebook target page. (ec4b587)
 - [x] Task: Write tests for post and comment extraction logic. (f231ea5)
 - [x] Task: Implement logic to identify and extract audio links from comments. (565dfb1)
 - [x] Task: Implement basic rate-limiting and human-mimicry delays. (545f05b)
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md) (03715ae)
 
 ## Phase 3: Storage and RSS Generation
-- [ ] Task: Implement JSON-based metadata storage for processed posts.
+- [~] Task: Implement JSON-based metadata storage for processed posts.
 - [ ] Task: Write tests for RSS feed generation.
 - [ ] Task: Implement audio file downloading and local serving logic.
 - [ ] Task: Integrate scraper with feed generator to produce a valid `podcast.xml`.
