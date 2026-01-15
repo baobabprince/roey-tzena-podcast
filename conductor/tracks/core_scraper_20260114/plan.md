@@ -20,7 +20,7 @@
 - [x] Task: Integrate scraper with feed generator to produce a valid `podcast.xml`. (7662074)
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Storage and RSS Generation' (Protocol in workflow.md) (8595205)
 
-## Phase 4: Integration and Deployment Readiness
+## Phase 4: Integration and Deployment Readiness [checkpoint: 9a265a0]
 - [x] Task: Create a main entry point to run the full scrape-and-generate cycle. (7eb4310)
 - [x] Task: Configure a GitHub Action workflow for scheduled execution. (bd72bc4)
-- [~] Task: Conductor - User Manual Verification 'Phase 4: Integration and Deployment Readiness' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Integration and Deployment Readiness' (Protocol in workflow.md) (9a265a0)
