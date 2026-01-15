@@ -9,6 +9,16 @@ export async function extractAudioFromNotebookLM(page: Page, url: string): Promi
   const maxRetries = 1;
   let lastError: Error | undefined;
 
+  // Handle cookies if provided via environment variable
+  if (process.env.GOOGLE_COOKIES) {
+    try {
+      const cookies = JSON.parse(process.env.GOOGLE_COOKIES);
+      await page.context().addCookies(cookies);
+    } catch (e) {
+      console.error('Failed to parse or add GOOGLE_COOKIES:', e);
+    }
+  }
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       await page.goto(url, { waitUntil: 'networkidle' });
