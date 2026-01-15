@@ -13,14 +13,14 @@
 - [x] Task: Implement basic rate-limiting and human-mimicry delays. (545f05b)
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Scraper Development' (Protocol in workflow.md) (03715ae)
 
-## Phase 3: Storage and RSS Generation
+## Phase 3: Storage and RSS Generation [checkpoint: 8595205]
 - [x] Task: Implement JSON-based metadata storage for processed posts. (c024f1e)
 - [x] Task: Write tests for RSS feed generation. (9cbc0b4)
 - [x] Task: Implement audio file downloading and local serving logic. (62fca59)
 - [x] Task: Integrate scraper with feed generator to produce a valid `podcast.xml`. (7662074)
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Storage and RSS Generation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Storage and RSS Generation' (Protocol in workflow.md) (8595205)
 
 ## Phase 4: Integration and Deployment Readiness
-- [ ] Task: Create a main entry point to run the full scrape-and-generate cycle.
+- [~] Task: Create a main entry point to run the full scrape-and-generate cycle.
 - [ ] Task: Configure a GitHub Action workflow for scheduled execution.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Integration and Deployment Readiness' (Protocol in workflow.md)
