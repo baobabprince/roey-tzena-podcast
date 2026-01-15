@@ -10,13 +10,17 @@ This plan outlines the steps to enhance the scraper to extract audio links from 
 
 ## Phase 2: NotebookLM Deep Scraper (TDD)
 - [x] Task: Create `src/scraper/notebooklm.ts` for specialized NotebookLM extraction. (2d4d5e2)
-- [ ] Task: Write failing tests for `extractAudioFromNotebookLM`.
-    - [ ] Test successful extraction of audio URL and title from a mock NotebookLM page.
-    - [ ] Test retry logic on failure.
-    - [ ] Test final failure after one retry.
-- [ ] Task: Implement `extractAudioFromNotebookLM` to pass tests.
-    - [ ] Use Playwright to navigate and extract data.
-    - [ ] Implement robust selectors for the audio element and page title.
+- [x] Task: Write failing tests for `extractAudioFromNotebookLM`. (554a6a8)
+    - [x] Test successful extraction of audio URL and title from a mock NotebookLM page.
+    - [x] Test retry logic on failure.
+    - [x] Test final failure after one retry.
+- [x] Task: Implement `extractAudioFromNotebookLM` to pass tests. (554a6a8)
+    - [x] Use Playwright to navigate and extract data.
+    - [x] Implement robust selectors for the audio element and page title.
+- [x] Task: Implement cookie-based authentication for NotebookLM. (6ce50a1)
+    - [x] Add `cookies` parameter to scraper initialization or context setup.
+    - [x] Load cookies from `GOOGLE_COOKIES` environment variable.
+    - [x] Inject cookies into the browser context before navigation.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: NotebookLM Deep Scraper (TDD)' (Protocol in workflow.md)
 
 ## Phase 3: Integration into Facebook Scraper
