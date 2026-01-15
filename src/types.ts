@@ -12,4 +12,5 @@ export interface Post {
   date: Date;
   url: string;
   comments: Comment[];
+  audioUrl?: string;
 }

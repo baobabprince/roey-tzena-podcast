@@ -7,11 +7,13 @@ describe('Extractor', () => {
 
   beforeAll(async () => {
     browser = await chromium.launch({ headless: true });
-  });
+  }, 30000);
 
   afterAll(async () => {
-    await browser.close();
-  });
+    if (browser) {
+      await browser.close();
+    }
+  }, 30000);
 
   beforeEach(async () => {
     page = await browser.newPage();
