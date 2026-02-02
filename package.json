@@ -21,6 +21,13 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "playwright": "^1.57.0"
+    "apify": "^3.5.3",
+    "apify-client": "^2.21.0",
+    "crawlee": "^3.15.3",
+    "dotenv": "^17.2.3",
+    "ghost-cursor": "^1.4.2",
+    "playwright": "^1.57.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
