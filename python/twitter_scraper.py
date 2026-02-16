@@ -23,13 +23,28 @@ class TwitterScraper:
 
     async def fetch_home_timeline(self, limit=70):
         print(f"Fetching {limit} tweets from home timeline...")
+        tweets = []
         try:
             # Try latest API method first
             tweets = await self.client.get_latest_timeline(count=limit)
-        except AttributeError:
-            # Fallback to older/alternative method
-            tweets = await self.client.get_timeline('home', count=limit)
+        except Exception as e:
+            print(f"Error fetching home timeline: {e}")
+            try:
+                # Fallback to older/alternative method
+                tweets = await self.client.get_timeline('home', count=limit)
+            except Exception as e2:
+                print(f"Error fetching home timeline fallback: {e2}")
         
+        if not tweets:
+            print("Home timeline is empty. Falling back to searching popular Hebrew tech/news accounts...")
+            # Fallback: Search for tweets from popular Hebrew accounts or specific hashtags
+            # This ensures we always have some content.
+            fallback_query = '(from:israelhayom OR from:ynetalerts OR from:N12News OR from:kann_news) lang:he'
+            try:
+                tweets = await self.client.search_tweet(fallback_query, product='Latest', count=limit)
+            except Exception as e3:
+                print(f"Error fetching fallback search: {e3}")
+
         print(f"Fetched {len(tweets) if tweets else 0} raw tweets.")
         return tweets
 
