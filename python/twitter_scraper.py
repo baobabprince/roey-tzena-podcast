@@ -49,11 +49,27 @@ class TwitterScraper:
             tweets = await self.client.get_latest_timeline(count=limit)
         except Exception as e:
             print(f"Error fetching home timeline: {e}")
-            try:
-                # Fallback to older/alternative method
-                tweets = await self.client.get_timeline('home', count=limit)
-            except Exception as e2:
-                print(f"Error fetching home timeline fallback: {e2}")
+            # If 401, maybe try to login again if we haven't already
+            if '401' in str(e) and self.username and self.password:
+                print("Session might be expired. Attempting full login...")
+                try:
+                    await self.client.login(
+                        auth_info_1=self.username,
+                        auth_info_2=self.email,
+                        password=self.password,
+                        totp_secret=self.totp_secret
+                    )
+                    tweets = await self.client.get_latest_timeline(count=limit)
+                except Exception as login_err:
+                    print(f"Login fallback failed: {login_err}")
+
+            if not tweets:
+                try:
+                    # Fallback to older/alternative method
+                    # Fix: positional 'home' and keyword 'count'
+                    tweets = await self.client.get_timeline(category='home', count=limit)
+                except Exception as e2:
+                    print(f"Error fetching home timeline fallback: {e2}")
         
         if not tweets:
             print("Home timeline is empty. Falling back to searching popular Hebrew tech/news accounts...")

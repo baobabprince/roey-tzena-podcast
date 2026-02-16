@@ -61,7 +61,13 @@ async def run_pipeline():
         
         rss = RSSManager(feed_url="", site_url="https://twitter.com")
         description = script[:200] + "..." # Short summary for RSS
-        full_title = f"{ai_title} ({date_str})"
+        
+        # Add Morning/Evening indicator based on IST (UTC+2)
+        # IST is UTC+2. Action runs at 05:00 UTC (07:00 IST) and 15:00 UTC (17:00 IST)
+        hour = (now.hour + 2) % 24
+        period = "מהדורת בוקר" if hour < 12 else "מהדורת ערב"
+        
+        full_title = f"{period}: {ai_title} ({date_str})"
         episodes = rss.add_episode(full_title, description, audio_url, file_size)
         rss.generate_rss(episodes, 'rss.xml')
         

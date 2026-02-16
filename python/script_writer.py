@@ -38,8 +38,19 @@ class ScriptWriter:
             generation_config={"response_mime_type": "application/json"}
         )
         try:
-            return json.loads(response.text)
-        except:
+            res_data = json.loads(response.text)
+            if isinstance(res_data, list) and len(res_data) > 0:
+                res_data = res_data[0]
+            
+            if not isinstance(res_data, dict):
+                return {"title": "עדכון יומי", "script": response.text}
+                
+            return {
+                "title": res_data.get('title', "עדכון יומי"),
+                "script": res_data.get('script', response.text)
+            }
+        except Exception as e:
+            print(f"Error parsing Gemini response: {e}")
             # Fallback if JSON parsing fails
             return {"title": "עדכון יומי", "script": response.text}
 
