@@ -23,27 +23,38 @@ class TwitterScraper:
 
     async def fetch_home_timeline(self, limit=70):
         print(f"Fetching {limit} tweets from home timeline...")
-        # Note: Twikit's get_timeline might vary based on version, 
-        # usually it is client.get_latest_timeline() or similar.
-        tweets = await self.client.get_timeline('home', count=limit)
+        try:
+            # Try latest API method first
+            tweets = await self.client.get_latest_timeline(count=limit)
+        except AttributeError:
+            # Fallback to older/alternative method
+            tweets = await self.client.get_timeline('home', count=limit)
         return tweets
 
     def filter_and_rank(self, tweets):
         print("Filtering ads and ranking by engagement...")
         processed = []
         for t in tweets:
+            # Ensure it is a tweet object with text
+            if not hasattr(t, 'text') or not t.text:
+                continue
+
             # Absolute filtering of promoted content
             if hasattr(t, 'promoted_metadata') and t.promoted_metadata:
                 continue
             
             # Engagement = Likes + Retweets
-            engagement = t.favorite_count + t.retweet_count
+            # Handle potential missing attributes safely
+            favs = getattr(t, 'favorite_count', 0) or 0
+            rts = getattr(t, 'retweet_count', 0) or 0
+            engagement = favs + rts
+            
             processed.append({
                 'id': t.id,
                 'text': t.text,
-                'user': t.user.screen_name,
+                'user': getattr(t.user, 'screen_name', 'unknown'),
                 'engagement': engagement,
-                'created_at': t.created_at
+                'created_at': getattr(t, 'created_at', '')
             })
         
         # Sort by engagement descending

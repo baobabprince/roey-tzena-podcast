@@ -1,6 +1,8 @@
 name: X-Radio Digest (Cloud Automation)
 
 on:
+  push:
+    branches: [ main, master ]
   schedule:
     # 07:00 and 17:00 IST (UTC+2) -> 05:00 and 15:00 UTC
     - cron: '0 5 * * *'

@@ -3,7 +3,6 @@ import os
 import json
 from feedgen.feed import FeedGenerator
 from datetime import datetime, timezone
-import pytz
 
 class RSSManager:
     def __init__(self, feed_url, site_url):
