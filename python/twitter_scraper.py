@@ -84,7 +84,7 @@ class TwitterScraper:
             print(f"Fetching replies for tweet {tweet['id']} by {tweet['user']}...")
             try:
                 # Fetching tweet thread/replies
-                replies = await self.client.get_tweet_details(tweet['id'])
+                replies = await self.client.get_tweet_by_id(tweet['id'])
                 # Filter for top replies (usually the first ones returned are high engagement)
                 tweet['replies'] = [
                     {'user': r.user.screen_name, 'text': r.text}
