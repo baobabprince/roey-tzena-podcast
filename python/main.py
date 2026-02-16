@@ -54,11 +54,15 @@ async def run_pipeline():
     print(f"--- Pipeline Finished. Created {audio_filename} ---")
     
     # Output the tag and filename for the GitHub Action to use
-    with open(os.environ.get('GITHUB_OUTPUT', 'pipeline_output.txt'), 'a') as f:
-        f.write(f"tag_name={tag_name}
-")
-        f.write(f"audio_file={audio_filename}
-")
+    github_output = os.environ.get('GITHUB_OUTPUT')
+    if github_output:
+        with open(github_output, 'a') as f:
+            f.write(f"tag_name={tag_name}\n")
+            f.write(f"audio_file={audio_filename}\n")
+    else:
+        with open('pipeline_output.txt', 'a') as f:
+            f.write(f"tag_name={tag_name}\n")
+            f.write(f"audio_file={audio_filename}\n")
 
 if __name__ == "__main__":
     asyncio.run(run_pipeline())
