@@ -11,15 +11,35 @@ load_dotenv()
 class TwitterScraper:
     def __init__(self):
         self.client = Client('en-US')
+        self.username = os.getenv('X_USERNAME')
+        self.password = os.getenv('X_PASSWORD')
+        self.email = os.getenv('X_EMAIL')
+        self.totp_secret = os.getenv('X_TOTP_SECRET')
         self.auth_token = os.getenv('X_AUTH_TOKEN')
         self.ct0 = os.getenv('X_CT0')
 
     async def login(self):
-        print("Initializing client with session cookies...")
-        self.client.set_cookies({
-            'auth_token': self.auth_token,
-            'ct0': self.ct0
-        })
+        # Prefer session cookies if available
+        if self.auth_token and self.ct0:
+            print("Initializing client with session cookies...")
+            self.client.set_cookies({
+                'auth_token': self.auth_token,
+                'ct0': self.ct0
+            })
+            return
+
+        # Fallback to full login if cookies are missing or expired
+        if self.username and self.password:
+            print(f"Logging in as {self.username}...")
+            await self.client.login(
+                auth_info_1=self.username,
+                auth_info_2=self.email,
+                password=self.password,
+                totp_secret=self.totp_secret
+            )
+            print("Login successful.")
+        else:
+            print("Error: No authentication method provided (cookies or credentials).")
 
     async def fetch_home_timeline(self, limit=70):
         print(f"Fetching {limit} tweets from home timeline...")
