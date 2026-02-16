@@ -26,9 +26,17 @@ async def run_pipeline():
             'other_mentions': ranked_tweets[5:20]
         }
         
+        print("\n--- RAW TWEET DATA ---")
+        print(json.dumps(tweets_context, ensure_ascii=False, indent=2))
+        print("----------------------\n")
+        
         # 2. Generate Script
         writer = ScriptWriter()
         script = writer.generate_script(tweets_context)
+        
+        print("\n--- PODCAST TRANSCRIPT ---")
+        print(script)
+        print("--------------------------\n")
         
         # 3. Generate Audio
         producer = AudioProducer()
