@@ -51,3 +51,6 @@ Used to create Releases and push RSS updates.
 1.  Go to your repository on GitHub.
 2.  Click **Settings** > **Secrets and variables** > **Actions**.
 3.  Click **New repository secret** for each item above.
+
+
+gh secret set X_CT0 --body "343c0c3ecaab3200c11415af0d58ced399098b98881dc3d73377e05e334a8f1d9121425d4e9fad995cdcceaad209613cc5feb9d72ae1c1bec0e7bae09575760462f9145ee1fc0f0a4f385bc8ea0905"
