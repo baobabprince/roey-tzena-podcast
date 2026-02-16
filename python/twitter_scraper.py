@@ -29,6 +29,8 @@ class TwitterScraper:
         except AttributeError:
             # Fallback to older/alternative method
             tweets = await self.client.get_timeline('home', count=limit)
+        
+        print(f"Fetched {len(tweets) if tweets else 0} raw tweets.")
         return tweets
 
     def filter_and_rank(self, tweets):

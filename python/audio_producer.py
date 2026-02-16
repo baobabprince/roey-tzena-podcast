@@ -21,7 +21,7 @@ class AudioProducer:
         self.client = texttospeech.TextToSpeechClient()
         self.voice = texttospeech.VoiceSelectionParams(
             language_code="he-IL",
-            name="he-IL-Neural2-A" # Top-tier Neural voice for Hebrew
+            name="he-IL-Wavenet-A" # High-quality Wavenet voice for Hebrew
         )
         self.audio_config = texttospeech.AudioConfig(
             audio_encoding=texttospeech.AudioEncoding.MP3,
