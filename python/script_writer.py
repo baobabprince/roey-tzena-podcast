@@ -27,12 +27,21 @@ class ScriptWriter:
         נתוני הציוצים הגולמיים:
         {json.dumps(data, ensure_ascii=False)}
         
-        כתוב אך ורק את התסריט להקראה, ללא הערות שוליים.
+        ענה בפורמט JSON עם השדות הבאים:
+        - "title": כותרת קצרה וקולעת לפרק (ללא המילה "פרק").
+        - "script": התסריט המלא להקראה.
         """
         
         print("Generating script with Gemini 2.0 Flash...")
-        response = self.model.generate_content(prompt)
-        return response.text
+        response = self.model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
+        )
+        try:
+            return json.loads(response.text)
+        except:
+            # Fallback if JSON parsing fails
+            return {"title": "עדכון יומי", "script": response.text}
 
 def main():
     if not os.path.exists('tweets_data.json'):

@@ -32,32 +32,37 @@ async def run_pipeline():
         
         # 2. Generate Script
         writer = ScriptWriter()
-        script = writer.generate_script(tweets_context)
+        script_data = writer.generate_script(tweets_context)
+        script = script_data.get('script', '')
+        ai_title = script_data.get('title', 'X-Radio Digest')
         
         print("\n--- PODCAST TRANSCRIPT ---")
+        print(f"TITLE: {ai_title}")
         print(script)
         print("--------------------------\n")
         
         # 3. Generate Audio
         producer = AudioProducer()
-        date_str = datetime.now().strftime('%Y-%m-%d')
-        tag_name = f"digest-{date_str}"
-        audio_filename = f"digest_{date_str}.mp3"
+        now = datetime.now()
+        date_str = now.strftime('%Y-%m-%d')
+        time_str = now.strftime('%H%M')
+        tag_name = f"digest-{date_str}-{time_str}"
+        audio_filename = f"digest_{date_str}_{time_str}.mp3"
         
         success = producer.generate_audio(script, audio_filename)
         if not success:
             print("Failed to generate audio.")
             sys.exit(1)
 
-        # 4. Prepare for RSS (The actual URL will be the GitHub Release URL)
-        # Pattern: https://github.com/<OWNER>/<REPO>/releases/download/<TAG>/<FILE>
-        repo = os.getenv('GITHUB_REPOSITORY', 'rotemhadar/roey-tzena-podcast')
+        # 4. Prepare for RSS
+        repo = os.getenv('GITHUB_REPOSITORY', 'baobabprince/roey-tzena-podcast')
         audio_url = f"https://github.com/{repo}/releases/download/{tag_name}/{audio_filename}"
         file_size = os.path.getsize(audio_filename)
         
         rss = RSSManager(feed_url="", site_url="https://twitter.com")
         description = script[:200] + "..." # Short summary for RSS
-        episodes = rss.add_episode(f"X-Radio Digest {date_str}", description, audio_url, file_size)
+        full_title = f"{ai_title} ({date_str})"
+        episodes = rss.add_episode(full_title, description, audio_url, file_size)
         rss.generate_rss(episodes, 'rss.xml')
         
         print(f"--- Pipeline Finished. Created {audio_filename} ---")
