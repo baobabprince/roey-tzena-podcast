@@ -68,4 +68,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add rss.xml episodes_db.json
           git commit -m "Update RSS feed [skip ci]" || echo "No changes to commit"
-          git push origin main
+          git push origin master
