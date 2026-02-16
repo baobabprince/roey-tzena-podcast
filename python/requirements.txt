@@ -1,0 +1,6 @@
+twikit
+google-generativeai
+google-cloud-texttospeech
+python-dotenv
+feedgen
+requests
