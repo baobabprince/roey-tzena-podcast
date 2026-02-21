@@ -48,14 +48,26 @@ async def test_fetch_home_timeline_success(mock_twikit_client):
     mock_get_latest_timeline.assert_called_once_with(count=10)
 
 @pytest.mark.asyncio
-async def test_fetch_home_timeline_fallback(mock_twikit_client):
+async def test_fetch_home_timeline_fallback_to_get_timeline(mock_twikit_client):
     scraper = TwitterScraper()
     mock_twikit_client.return_value.get_latest_timeline.side_effect = Exception("401 Unauthorized")
-    mock_search_tweet = AsyncMock(return_value=["fallback_tweet"])
+    mock_get_timeline = AsyncMock(return_value=["get_timeline_tweet"])
+    mock_twikit_client.return_value.get_timeline = mock_get_timeline
+
+    tweets = await scraper.fetch_home_timeline(limit=10)
+    assert tweets == ["get_timeline_tweet"]
+    mock_get_timeline.assert_called_once_with(count=10)
+
+@pytest.mark.asyncio
+async def test_fetch_home_timeline_fallback_to_search(mock_twikit_client):
+    scraper = TwitterScraper()
+    mock_twikit_client.return_value.get_latest_timeline.side_effect = Exception("Error")
+    mock_twikit_client.return_value.get_timeline.side_effect = Exception("Error")
+    mock_search_tweet = AsyncMock(return_value=["search_tweet"])
     mock_twikit_client.return_value.search_tweet = mock_search_tweet
 
     tweets = await scraper.fetch_home_timeline(limit=10)
-    assert tweets == ["fallback_tweet"]
+    assert tweets == ["search_tweet"]
     mock_search_tweet.assert_called_once()
 
 def test_filter_and_rank():

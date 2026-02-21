@@ -14,9 +14,9 @@ async def test_run_pipeline_success():
 
         mock_scraper = MockScraper.return_value
         mock_scraper.login = AsyncMock()
-        mock_scraper.fetch_home_timeline = AsyncMock(return_value=[])
-        mock_scraper.filter_and_rank = MagicMock(return_value=[])
-        mock_scraper.get_deep_dive = AsyncMock(return_value=[])
+        mock_scraper.fetch_home_timeline = AsyncMock(return_value=[{'id': '1'}])
+        mock_scraper.filter_and_rank = MagicMock(return_value=[{'id': '1', 'text': 'test', 'user': 'user', 'engagement': 10, 'created_at': ''}])
+        mock_scraper.get_deep_dive = AsyncMock(return_value=[{'id': '1', 'text': 'test', 'user': 'user', 'engagement': 10, 'created_at': '', 'replies': []}])
 
         mock_writer = MockWriter.return_value
         mock_writer.generate_script = MagicMock(return_value={'title': 'Test', 'script': 'Content'})
@@ -39,12 +39,10 @@ async def test_run_pipeline_success():
             mock_rss.generate_rss.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_run_pipeline_failure():
+async def test_run_pipeline_failure_is_now_skip():
     with patch('main.TwitterScraper') as MockScraper:
         mock_scraper = MockScraper.return_value
         mock_scraper.login = AsyncMock(side_effect=Exception("Login failed"))
 
-        with pytest.raises(SystemExit) as cm:
-            await run_pipeline()
-
-        assert cm.value.code == 1
+        # Should not raise SystemExit anymore, should return early
+        await run_pipeline()

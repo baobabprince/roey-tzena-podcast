@@ -66,8 +66,8 @@ class TwitterScraper:
             if not tweets:
                 try:
                     # Fallback to older/alternative method
-                    # Fix: positional 'home' and keyword 'count'
-                    tweets = await self.client.get_timeline(category='home', count=limit)
+                    # The get_timeline method in recent twikit doesn't take 'category'
+                    tweets = await self.client.get_timeline(count=limit)
                 except Exception as e2:
                     print(f"Error fetching home timeline fallback: {e2}")
         

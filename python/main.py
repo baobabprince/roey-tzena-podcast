@@ -15,9 +15,22 @@ async def run_pipeline():
     try:
         # 1. Scrape Tweets
         scraper = TwitterScraper()
-        await scraper.login()
-        raw_tweets = await scraper.fetch_home_timeline(70)
-        ranked_tweets = scraper.filter_and_rank(raw_tweets)
+        try:
+            await scraper.login()
+            raw_tweets = await scraper.fetch_home_timeline(70)
+            ranked_tweets = scraper.filter_and_rank(raw_tweets)
+        except Exception as e:
+            print(f"Scraping process failed: {e}")
+            ranked_tweets = []
+
+        if not ranked_tweets:
+            print("No tweets harvested. Skipping podcast generation.")
+            github_output = os.environ.get('GITHUB_OUTPUT')
+            if github_output:
+                with open(github_output, 'a') as f:
+                    f.write("skipped=true\n")
+            return
+
         top_5 = ranked_tweets[:5]
         deep_dive_data = await scraper.get_deep_dive(top_5)
         

@@ -5,3 +5,7 @@ dist/
 cookie.json
 coverage/
 .DS_Store
+__pycache__/
+*.pyc
+pipeline_output.txt
+*.mp3
