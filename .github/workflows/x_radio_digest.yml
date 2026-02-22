@@ -58,7 +58,7 @@ jobs:
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v2
-        if: success()
+        if: success() && steps.run_pipeline.outputs.skipped != 'true'
         with:
           tag_name: ${{ steps.run_pipeline.outputs.tag_name }}
           files: digest_*.mp3
@@ -67,6 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit and Push RSS Update
+        if: success() && steps.run_pipeline.outputs.skipped != 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
