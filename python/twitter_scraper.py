@@ -17,7 +17,7 @@ class TwitterScraper:
         self.totp_secret = os.getenv('X_TOTP_SECRET')
         self.auth_token = os.getenv('X_AUTH_TOKEN')
         self.ct0 = os.getenv('X_CT0')
-        self.apify_token = os.getenv('APIFY_API_TOKEN')
+        self.apify_token = os.getenv('APIFY_TOKEN')
         self.apify_actor = os.getenv('APIFY_ACTOR_ID', 'apify/twitter-scraper')
 
     async def login(self):
@@ -135,7 +135,7 @@ class TwitterScraper:
                 print("Twikit failed to fetch home timeline. Trying Apify fallback...")
                 tweets = await self.fetch_via_apify(limit)
             else:
-                print("NOTICE: Apify fallback not configured. Consider setting APIFY_API_TOKEN for better resilience.")
+                print("NOTICE: Apify fallback not configured. Consider setting APIFY_TOKEN for better resilience.")
 
         if not tweets:
             print("Home timeline is empty. Falling back to searching popular Hebrew tech/news accounts...")
