@@ -79,6 +79,8 @@ class TwitterScraper:
             return tweets
         except Exception as e:
             print(f"Apify fallback failed: {e}")
+            import traceback
+            traceback.print_exc()
             return []
 
     async def fetch_home_timeline(self, limit=70):
