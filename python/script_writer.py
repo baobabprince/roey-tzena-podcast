@@ -1,16 +1,16 @@
 
 import os
 import json
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class ScriptWriter:
     def __init__(self):
-        genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+        self.client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
         # Using the most updated Gemini 2.0 Flash model
-        self.model = genai.GenerativeModel('gemini-2.0-flash')
+        self.model_name = 'gemini-2.0-flash'
 
     def generate_script(self, data):
         prompt = f"""
@@ -33,9 +33,10 @@ class ScriptWriter:
         """
         
         print("Generating script with Gemini 2.0 Flash...")
-        response = self.model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
+        response = self.client.models.generate_content(
+            model=self.model_name,
+            contents=prompt,
+            config={'response_mime_type': 'application/json'}
         )
         try:
             res_data = json.loads(response.text)

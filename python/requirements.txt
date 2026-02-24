@@ -1,5 +1,5 @@
 twikit
-google-generativeai
+google-genai
 google-cloud-texttospeech
 python-dotenv
 feedgen

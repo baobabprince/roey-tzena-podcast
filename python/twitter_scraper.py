@@ -24,22 +24,33 @@ class TwitterScraper:
         # Prefer session cookies if available
         if self.auth_token and self.ct0:
             print("Initializing client with session cookies...")
-            self.client.set_cookies({
-                'auth_token': self.auth_token,
-                'ct0': self.ct0
-            })
-            return
+            try:
+                self.client.set_cookies({
+                    'auth_token': self.auth_token,
+                    'ct0': self.ct0
+                })
+                return
+            except Exception as e:
+                print(f"Error setting cookies: {e}")
 
         # Fallback to full login if cookies are missing or expired
         if self.username and self.password:
             print(f"Logging in as {self.username}...")
-            await self.client.login(
-                auth_info_1=self.username,
-                auth_info_2=self.email,
-                password=self.password,
-                totp_secret=self.totp_secret
-            )
-            print("Login successful.")
+            try:
+                await self.client.login(
+                    auth_info_1=self.username,
+                    auth_info_2=self.email,
+                    password=self.password,
+                    totp_secret=self.totp_secret
+                )
+                print("Login successful.")
+            except Exception as e:
+                print(f"Login failed: {e}")
+                if '403' in str(e):
+                    print("CRITICAL: Login blocked by Cloudflare (403). X is detecting this runner as a bot.")
+                    print("HINT: Update your X_AUTH_TOKEN and X_CT0 secrets with fresh session cookies from a real browser.")
+                elif '401' in str(e):
+                    print("CRITICAL: Authentication failed (401). Check your credentials.")
         else:
             print("Error: No authentication method provided (cookies or credentials).")
 
@@ -91,9 +102,12 @@ class TwitterScraper:
             tweets = await self.client.get_latest_timeline(count=limit)
         except Exception as e:
             print(f"Error fetching home timeline: {e}")
+            if '401' in str(e):
+                print("Session cookies (X_AUTH_TOKEN/X_CT0) appear to be expired or invalid.")
+
             # If 401, maybe try to login again if we haven't already
             if '401' in str(e) and self.username and self.password:
-                print("Session might be expired. Attempting full login...")
+                print("Attempting full login fallback...")
                 try:
                     await self.client.login(
                         auth_info_1=self.username,
@@ -104,6 +118,8 @@ class TwitterScraper:
                     tweets = await self.client.get_latest_timeline(count=limit)
                 except Exception as login_err:
                     print(f"Login fallback failed: {login_err}")
+                    if '403' in str(login_err):
+                        print("Cloudflare block detected during login fallback. Cannot proceed with standard scraping.")
 
             if not tweets:
                 try:
@@ -114,9 +130,12 @@ class TwitterScraper:
                     print(f"Error fetching home timeline fallback: {e2}")
         
         # Apify Fallback - Try to get the specific user feed if twikit failed
-        if not tweets and self.apify_token:
-            print("Twikit failed to fetch home timeline. Trying Apify fallback...")
-            tweets = await self.fetch_via_apify(limit)
+        if not tweets:
+            if self.apify_token:
+                print("Twikit failed to fetch home timeline. Trying Apify fallback...")
+                tweets = await self.fetch_via_apify(limit)
+            else:
+                print("NOTICE: Apify fallback not configured. Consider setting APIFY_API_TOKEN for better resilience.")
 
         if not tweets:
             print("Home timeline is empty. Falling back to searching popular Hebrew tech/news accounts...")
