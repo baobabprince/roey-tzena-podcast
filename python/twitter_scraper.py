@@ -82,6 +82,10 @@ class TwitterScraper:
             # Start the actor and wait for it to finish
             run = await client.actor(self.apify_actor).call(run_input=run_input)
 
+            # Log actor status/message for better debugging (especially for Free Plan users)
+            if 'status' in run:
+                print(f"Apify actor finished with status: {run['status']}")
+
             tweets = []
             async for item in client.dataset(run['defaultDatasetId']).iterate_items():
                 tweets.append(item)
@@ -163,9 +167,10 @@ class TwitterScraper:
             is_dict = isinstance(t, dict)
 
             # Extract text (handle twikit and various Apify actors)
+            # Checking both snake_case and camelCase common in JS actors
             text = get_val(t, 'text')
             if not text and is_dict:
-                text = t.get('full_text')
+                text = t.get('full_text') or t.get('fullText') or t.get('tweet_text')
 
             if not text:
                 continue
@@ -176,6 +181,7 @@ class TwitterScraper:
                 promoted = any([
                     t.get('is_ad'),
                     t.get('is_promoted'),
+                    t.get('isPromoted'),
                     t.get('promoted_metadata'),
                     'promoted' in str(t.get('source', '')).lower()
                 ])
@@ -185,32 +191,44 @@ class TwitterScraper:
             if promoted:
                 continue
             
-            # Engagement = Likes + Retweets
-            favs = get_val(t, 'favorite_count', 0) or 0
-            rts = get_val(t, 'retweet_count', 0) or 0
-            engagement = favs + rts
+            # Engagement = Likes + Retweets + Replies
+            # Checking both snake_case and camelCase
+            favs = get_val(t, 'favorite_count', 0) or get_val(t, 'favoriteCount', 0) or 0
+            rts = get_val(t, 'retweet_count', 0) or get_val(t, 'retweetCount', 0) or 0
+            replies = get_val(t, 'reply_count', 0) or get_val(t, 'replyCount', 0) or 0
+
+            engagement = favs + rts + replies
             
             # User info
             user_val = get_val(t, 'user')
             screen_name = 'unknown'
             if user_val:
-                screen_name = get_val(user_val, 'screen_name', 'unknown')
+                screen_name = get_val(user_val, 'screen_name') or get_val(user_val, 'screenName') or 'unknown'
 
             # ID
             tweet_id = get_val(t, 'id')
             if not tweet_id and is_dict:
-                tweet_id = t.get('id_str')
+                tweet_id = t.get('id_str') or t.get('tweet_id')
 
             processed.append({
                 'id': tweet_id,
                 'text': text,
                 'user': screen_name,
                 'engagement': engagement,
-                'created_at': get_val(t, 'created_at', '')
+                'created_at': get_val(t, 'created_at', '') or get_val(t, 'createdAt', '')
             })
         
         # Sort by engagement descending
         processed.sort(key=lambda x: x['engagement'], reverse=True)
+
+        if not processed and tweets:
+            print("DEBUG: Filtering yielded 0 results from harvested items.")
+            if isinstance(tweets[0], dict):
+                print(f"DEBUG: Sample item keys: {list(tweets[0].keys())}")
+                # Print a small snippet of the first item to see what's wrong
+                sample = {k: tweets[0][k] for k in list(tweets[0].keys())[:10]}
+                print(f"DEBUG: Sample item snippet: {sample}")
+
         return processed
 
     async def get_deep_dive(self, top_tweets, replies_limit=5):
