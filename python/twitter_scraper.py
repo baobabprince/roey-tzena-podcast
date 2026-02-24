@@ -17,6 +17,8 @@ class TwitterScraper:
         self.totp_secret = os.getenv('X_TOTP_SECRET')
         self.auth_token = os.getenv('X_AUTH_TOKEN')
         self.ct0 = os.getenv('X_CT0')
+        self.apify_token = os.getenv('APIFY_API_TOKEN')
+        self.apify_actor = os.getenv('APIFY_ACTOR_ID', 'apify/twitter-scraper')
 
     async def login(self):
         # Prefer session cookies if available
@@ -40,6 +42,44 @@ class TwitterScraper:
             print("Login successful.")
         else:
             print("Error: No authentication method provided (cookies or credentials).")
+
+    async def fetch_via_apify(self, limit=70):
+        """Fallback method using Apify to scrape the home timeline."""
+        if not self.apify_token:
+            print("Apify token not set. Skipping Apify fallback.")
+            return []
+
+        print(f"Attempting to fetch home timeline via Apify actor {self.apify_actor}...")
+        try:
+            from apify_client import ApifyClientAsync
+            client = ApifyClientAsync(self.apify_token)
+
+            # Construct cookie string from available session data
+            cookie_list = []
+            if self.auth_token: cookie_list.append(f"auth_token={self.auth_token}")
+            if self.ct0: cookie_list.append(f"ct0={self.ct0}")
+            cookie_str = "; ".join(cookie_list)
+
+            # Common input format for Twitter scrapers on Apify
+            run_input = {
+                "maxItems": limit,
+                "cookie": cookie_str,
+                "urls": ["https://x.com/home"],
+                "scrapeHomeTimeline": True # Some actors use this flag
+            }
+
+            # Start the actor and wait for it to finish
+            run = await client.actor(self.apify_actor).call(run_input=run_input)
+
+            tweets = []
+            async for item in client.dataset(run['defaultDatasetId']).iterate_items():
+                tweets.append(item)
+
+            print(f"Apify successfully fetched {len(tweets)} items.")
+            return tweets
+        except Exception as e:
+            print(f"Apify fallback failed: {e}")
+            return []
 
     async def fetch_home_timeline(self, limit=70):
         print(f"Fetching {limit} tweets from home timeline...")
@@ -71,6 +111,11 @@ class TwitterScraper:
                 except Exception as e2:
                     print(f"Error fetching home timeline fallback: {e2}")
         
+        # Apify Fallback - Try to get the specific user feed if twikit failed
+        if not tweets and self.apify_token:
+            print("Twikit failed to fetch home timeline. Trying Apify fallback...")
+            tweets = await self.fetch_via_apify(limit)
+
         if not tweets:
             print("Home timeline is empty. Falling back to searching popular Hebrew tech/news accounts...")
             # Fallback: Search for tweets from popular Hebrew accounts or specific hashtags
@@ -87,27 +132,60 @@ class TwitterScraper:
     def filter_and_rank(self, tweets):
         print("Filtering ads and ranking by engagement...")
         processed = []
+
+        def get_val(obj, key, default=None):
+            if isinstance(obj, dict):
+                return obj.get(key, default)
+            return getattr(obj, key, default)
+
         for t in tweets:
-            # Ensure it is a tweet object with text
-            if not hasattr(t, 'text') or not t.text:
+            is_dict = isinstance(t, dict)
+
+            # Extract text (handle twikit and various Apify actors)
+            text = get_val(t, 'text')
+            if not text and is_dict:
+                text = t.get('full_text')
+
+            if not text:
                 continue
 
             # Absolute filtering of promoted content
-            if hasattr(t, 'promoted_metadata') and t.promoted_metadata:
+            promoted = False
+            if is_dict:
+                promoted = any([
+                    t.get('is_ad'),
+                    t.get('is_promoted'),
+                    t.get('promoted_metadata'),
+                    'promoted' in str(t.get('source', '')).lower()
+                ])
+            else:
+                promoted = hasattr(t, 'promoted_metadata') and t.promoted_metadata
+
+            if promoted:
                 continue
             
             # Engagement = Likes + Retweets
-            # Handle potential missing attributes safely
-            favs = getattr(t, 'favorite_count', 0) or 0
-            rts = getattr(t, 'retweet_count', 0) or 0
+            favs = get_val(t, 'favorite_count', 0) or 0
+            rts = get_val(t, 'retweet_count', 0) or 0
             engagement = favs + rts
             
+            # User info
+            user_val = get_val(t, 'user')
+            screen_name = 'unknown'
+            if user_val:
+                screen_name = get_val(user_val, 'screen_name', 'unknown')
+
+            # ID
+            tweet_id = get_val(t, 'id')
+            if not tweet_id and is_dict:
+                tweet_id = t.get('id_str')
+
             processed.append({
-                'id': t.id,
-                'text': t.text,
-                'user': getattr(t.user, 'screen_name', 'unknown'),
+                'id': tweet_id,
+                'text': text,
+                'user': screen_name,
                 'engagement': engagement,
-                'created_at': getattr(t, 'created_at', '')
+                'created_at': get_val(t, 'created_at', '')
             })
         
         # Sort by engagement descending

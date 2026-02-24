@@ -4,3 +4,4 @@ google-cloud-texttospeech
 python-dotenv
 feedgen
 requests
+apify-client
