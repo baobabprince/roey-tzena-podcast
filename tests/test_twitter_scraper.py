@@ -98,6 +98,38 @@ def test_filter_and_rank():
     assert ranked[1]['id'] == 1
     assert ranked[1]['engagement'] == 15
 
+def test_filter_and_rank_apify_style():
+    scraper = TwitterScraper()
+
+    tweets = [
+        {
+            'tweet_id': '101',
+            'fullText': 'Apify text 1',
+            'favoriteCount': 50,
+            'retweetCount': 20,
+            'replyCount': 10,
+            'user': {'screenName': 'apify_user'}
+        },
+        {
+            'id_str': '102',
+            'text': 'Apify text 2',
+            'favorite_count': 10,
+            'retweet_count': 5,
+            'user': {'screen_name': 'user2'}
+        }
+    ]
+
+    ranked = scraper.filter_and_rank(tweets)
+
+    assert len(ranked) == 2
+    # First one has 50+20+10 = 80 engagement
+    assert ranked[0]['id'] == '101'
+    assert ranked[0]['engagement'] == 80
+    assert ranked[0]['user'] == 'apify_user'
+    # Second one has 10+5 = 15 engagement
+    assert ranked[1]['id'] == '102'
+    assert ranked[1]['engagement'] == 15
+
 @pytest.mark.asyncio
 async def test_get_deep_dive(mock_twikit_client):
     scraper = TwitterScraper()

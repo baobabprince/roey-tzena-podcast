@@ -7,7 +7,7 @@ The X-Radio Digest now supports [Apify](https://apify.com) as a fallback mechani
 1.  Sign up or log in to [Apify](https://apify.com).
 2.  Go to **Settings > Integrations**.
 3.  Copy your **Personal API token**.
-4.  **GitHub Secret Name**: `APIFY_API_TOKEN`
+4.  **GitHub Secret Name**: `APIFY_TOKEN`
 
 ## 2. Configure Apify Actor (Optional)
 
@@ -24,7 +24,7 @@ The pipeline will automatically try to use Apify if the standard scraping method
 
 | Secret | Description |
 | :--- | :--- |
-| `APIFY_API_TOKEN` | Your Apify API Token |
+| `APIFY_TOKEN` | Your Apify API Token |
 | `APIFY_ACTOR_ID` | (Optional) The ID of the Apify actor to use |
 
 ### Why use Apify?
