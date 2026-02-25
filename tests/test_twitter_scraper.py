@@ -131,6 +131,49 @@ def test_filter_and_rank_apify_style():
     assert ranked[1]['engagement'] == 15
 
 @pytest.mark.asyncio
+async def test_fetch_via_apify_extracts_status():
+    scraper = TwitterScraper()
+    scraper.apify_token = "fake_token"
+
+    with patch('apify_client.ApifyClientAsync') as mock_client:
+        mock_actor = mock_client.return_value.actor.return_value
+        mock_actor.call = AsyncMock(return_value={'defaultDatasetId': 'dataset_id', 'status': 'SUCCEEDED'})
+
+        mock_dataset = mock_client.return_value.dataset.return_value
+
+        # Mock items matching the structure provided by the user
+        items = [
+            {
+                'type': 'follower',
+                'screen_name': 'user1',
+                'name': 'Name 1',
+                'status': {
+                    'id_str': 'tweet1',
+                    'text': 'Tweet text 1',
+                    'favorite_count': 10
+                }
+            },
+            {
+                'id_str': 'tweet2',
+                'text': 'Direct tweet',
+                'favorite_count': 5
+            }
+        ]
+
+        async def mock_iterate_items():
+            for item in items:
+                yield item
+
+        mock_dataset.iterate_items.return_value = mock_iterate_items()
+
+        tweets = await scraper.fetch_via_apify()
+
+        assert len(tweets) == 2
+        assert tweets[0]['id_str'] == 'tweet1'
+        assert tweets[0]['user']['screen_name'] == 'user1'
+        assert tweets[1]['id_str'] == 'tweet2'
+
+@pytest.mark.asyncio
 async def test_get_deep_dive(mock_twikit_client):
     scraper = TwitterScraper()
 
