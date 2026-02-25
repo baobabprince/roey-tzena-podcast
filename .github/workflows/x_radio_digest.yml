@@ -52,7 +52,8 @@ jobs:
             GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
             GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
             APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
-            APIFY_ACTOR_ID: ${{ secrets.APIFY_ACTOR_ID }}
+            APIFY_ACTOR_ID: ${{ vars.APIFY_ACTOR_ID }}
+            X_USER_ID: ${{ vars.X_USER_ID }}
             GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           python python/main.py

@@ -18,7 +18,8 @@ class TwitterScraper:
         self.auth_token = os.getenv('X_AUTH_TOKEN')
         self.ct0 = os.getenv('X_CT0')
         self.apify_token = os.getenv('APIFY_TOKEN')
-        self.apify_actor = os.getenv('APIFY_ACTOR_ID', 'apify/twitter-scraper')
+        self.apify_actor = os.getenv('APIFY_ACTOR_ID') or 'apify/twitter-scraper'
+        self.user_id = os.getenv('X_USER_ID')
 
     async def login(self):
         # Prefer session cookies if available
@@ -65,18 +66,14 @@ class TwitterScraper:
             from apify_client import ApifyClientAsync
             client = ApifyClientAsync(self.apify_token)
 
-            # Construct cookie string from available session data
-            cookie_list = []
-            if self.auth_token: cookie_list.append(f"auth_token={self.auth_token}")
-            if self.ct0: cookie_list.append(f"ct0={self.ct0}")
-            cookie_str = "; ".join(cookie_list)
-
-            # Common input format for Twitter scrapers on Apify
+            # Construct input structure based on user requirements
             run_input = {
-                "maxItems": limit,
-                "cookie": cookie_str,
-                "urls": ["https://x.com/home"],
-                "scrapeHomeTimeline": True # Some actors use this flag
+                "getFollowers": True,
+                "getFollowing": True,
+                "maxFollowers": int(os.getenv('APIFY_MAX_FOLLOWERS', 300)),
+                "maxFollowings": int(os.getenv('APIFY_MAX_FOLLOWINGS', 200)),
+                "user_id": self.user_id,
+                "username": self.username
             }
 
             # Start the actor and wait for it to finish
@@ -86,11 +83,26 @@ class TwitterScraper:
             if 'status' in run:
                 print(f"Apify actor finished with status: {run['status']}")
 
-            tweets = []
+            items = []
             async for item in client.dataset(run['defaultDatasetId']).iterate_items():
-                tweets.append(item)
+                items.append(item)
 
-            print(f"Apify successfully fetched {len(tweets)} items.")
+            # Extract tweets from 'status' field if present (common in follower/following actors)
+            tweets = []
+            for item in items:
+                if isinstance(item, dict) and 'status' in item and item['status']:
+                    tweet = item['status']
+                    # Ensure user info is attached for filter_and_rank
+                    if isinstance(tweet, dict) and 'user' not in tweet:
+                        tweet['user'] = {
+                            'screen_name': item.get('screen_name'),
+                            'name': item.get('name')
+                        }
+                    tweets.append(tweet)
+                else:
+                    tweets.append(item)
+
+            print(f"Apify successfully fetched {len(tweets)} tweets.")
             return tweets
         except Exception as e:
             print(f"Apify fallback failed: {e}")
