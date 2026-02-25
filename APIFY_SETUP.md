@@ -11,10 +11,10 @@ The X-Radio Digest now supports [Apify](https://apify.com) as a fallback mechani
 
 ## 2. Configure Apify Actor (Optional)
 
-By default, the system uses `apify/twitter-scraper`. If you wish to use a different actor, you can specify it.
+By default, the system uses `apify/twitter-scraper-lite`. If you wish to use a different actor, you can specify it. The system also has a built-in fallback mechanism that tries common actors if your primary choice fails.
 
-1.  Find a Twitter scraper actor on the Apify Store (e.g., `apify/twitter-scraper` or `quacker/twitter-scraper`).
-2.  **GitHub Secret Name**: `APIFY_ACTOR_ID` (Default: `apify/twitter-scraper`)
+1.  Find a Twitter scraper actor on the Apify Store (e.g., `apify/twitter-scraper-lite` or `quacker/twitter-scraper`).
+2.  **GitHub Secret Name**: `APIFY_ACTOR_ID` (Default: `apify/twitter-scraper-lite`)
 
 ## 3. How it Works
 

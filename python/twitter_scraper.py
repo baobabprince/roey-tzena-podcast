@@ -18,7 +18,7 @@ class TwitterScraper:
         self.auth_token = os.getenv('X_AUTH_TOKEN')
         self.ct0 = os.getenv('X_CT0')
         self.apify_token = os.getenv('APIFY_TOKEN')
-        self.apify_actor = os.getenv('APIFY_ACTOR_ID', 'apify/twitter-scraper')
+        self.apify_actor = os.getenv('APIFY_ACTOR_ID', 'apify/twitter-scraper-lite')
 
     async def login(self):
         # Prefer session cookies if available
@@ -60,43 +60,60 @@ class TwitterScraper:
             print("Apify token not set. Skipping Apify fallback.")
             return []
 
-        print(f"Attempting to fetch home timeline via Apify actor {self.apify_actor}...")
-        try:
-            from apify_client import ApifyClientAsync
-            client = ApifyClientAsync(self.apify_token)
+        # List of actors to try in order. We start with the configured one.
+        actors_to_try = [self.apify_actor]
+        # Add common alternatives if they aren't already the primary choice
+        for alt in ['apify/twitter-scraper-lite', 'quacker/twitter-scraper', 'apify/twitter-scraper']:
+            if alt not in actors_to_try:
+                actors_to_try.append(alt)
 
-            # Construct cookie string from available session data
-            cookie_list = []
-            if self.auth_token: cookie_list.append(f"auth_token={self.auth_token}")
-            if self.ct0: cookie_list.append(f"ct0={self.ct0}")
-            cookie_str = "; ".join(cookie_list)
+        # Construct cookie string from available session data
+        cookie_list = []
+        if self.auth_token: cookie_list.append(f"auth_token={self.auth_token}")
+        if self.ct0: cookie_list.append(f"ct0={self.ct0}")
+        cookie_str = "; ".join(cookie_list)
 
-            # Common input format for Twitter scrapers on Apify
-            run_input = {
-                "maxItems": limit,
-                "cookie": cookie_str,
-                "urls": ["https://x.com/home"],
-                "scrapeHomeTimeline": True # Some actors use this flag
-            }
+        from apify_client import ApifyClientAsync
+        client = ApifyClientAsync(self.apify_token)
 
-            # Start the actor and wait for it to finish
-            run = await client.actor(self.apify_actor).call(run_input=run_input)
+        for actor_id in actors_to_try:
+            print(f"Attempting to fetch home timeline via Apify actor {actor_id}...")
+            try:
+                # Common input format for Twitter scrapers on Apify
+                run_input = {
+                    "maxItems": limit,
+                    "maxTweets": limit,
+                    "cookie": cookie_str,
+                    "urls": ["https://x.com/home"],
+                    "scrapeHomeTimeline": True,
+                    "searchMode": "latest"
+                }
 
-            # Log actor status/message for better debugging (especially for Free Plan users)
-            if 'status' in run:
-                print(f"Apify actor finished with status: {run['status']}")
+                # Start the actor and wait for it to finish
+                run = await client.actor(actor_id).call(run_input=run_input)
 
-            tweets = []
-            async for item in client.dataset(run['defaultDatasetId']).iterate_items():
-                tweets.append(item)
+                # Log actor status/message for better debugging (especially for Free Plan users)
+                if 'status' in run:
+                    print(f"Apify actor {actor_id} finished with status: {run['status']}")
 
-            print(f"Apify successfully fetched {len(tweets)} items.")
-            return tweets
-        except Exception as e:
-            print(f"Apify fallback failed: {e}")
-            import traceback
-            traceback.print_exc()
-            return []
+                tweets = []
+                async for item in client.dataset(run['defaultDatasetId']).iterate_items():
+                    tweets.append(item)
+
+                if tweets:
+                    print(f"Apify successfully fetched {len(tweets)} items using {actor_id}.")
+                    return tweets
+                else:
+                    print(f"Actor {actor_id} returned no tweets, trying next...")
+            except Exception as e:
+                print(f"Apify attempt with {actor_id} failed: {e}")
+                if "not found" in str(e).lower():
+                    continue # Try next actor if this one doesn't exist
+                # For other errors, we might still want to try the next actor
+                continue
+
+        print("All Apify actor attempts failed.")
+        return []
 
     async def fetch_home_timeline(self, limit=70):
         print(f"Fetching {limit} tweets from home timeline...")
@@ -170,7 +187,7 @@ class TwitterScraper:
             # Checking both snake_case and camelCase common in JS actors
             text = get_val(t, 'text')
             if not text and is_dict:
-                text = t.get('full_text') or t.get('fullText') or t.get('tweet_text')
+                text = t.get('full_text') or t.get('fullText') or t.get('tweet_text') or t.get('tweetText') or t.get('content')
 
             if not text:
                 continue
@@ -193,11 +210,13 @@ class TwitterScraper:
             
             # Engagement = Likes + Retweets + Replies
             # Checking both snake_case and camelCase
-            favs = get_val(t, 'favorite_count', 0) or get_val(t, 'favoriteCount', 0) or 0
+            favs = get_val(t, 'favorite_count', 0) or get_val(t, 'favoriteCount', 0) or \
+                   get_val(t, 'like_count', 0) or get_val(t, 'likeCount', 0) or 0
             rts = get_val(t, 'retweet_count', 0) or get_val(t, 'retweetCount', 0) or 0
             replies = get_val(t, 'reply_count', 0) or get_val(t, 'replyCount', 0) or 0
+            quotes = get_val(t, 'quote_count', 0) or get_val(t, 'quoteCount', 0) or 0
 
-            engagement = favs + rts + replies
+            engagement = favs + rts + replies + quotes
             
             # User info
             user_val = get_val(t, 'user')
@@ -208,7 +227,7 @@ class TwitterScraper:
             # ID
             tweet_id = get_val(t, 'id')
             if not tweet_id and is_dict:
-                tweet_id = t.get('id_str') or t.get('tweet_id')
+                tweet_id = t.get('id_str') or t.get('tweet_id') or t.get('rest_id')
 
             processed.append({
                 'id': tweet_id,

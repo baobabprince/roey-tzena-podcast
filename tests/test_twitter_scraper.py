@@ -131,6 +131,45 @@ def test_filter_and_rank_apify_style():
     assert ranked[1]['engagement'] == 15
 
 @pytest.mark.asyncio
+async def test_fetch_via_apify_fallback(mock_twikit_client):
+    scraper = TwitterScraper()
+    scraper.apify_token = "fake_token"
+    scraper.apify_actor = "invalid-actor"
+
+    with patch('apify_client.ApifyClientAsync') as mock_apify:
+        mock_client = mock_apify.return_value
+
+        # First actor fails
+        mock_actor_fail = MagicMock()
+        mock_actor_fail.call = AsyncMock(side_effect=Exception("Actor not found"))
+
+        # Second actor succeeds
+        mock_actor_success = MagicMock()
+        mock_actor_success.call = AsyncMock(return_value={'defaultDatasetId': 'dsid', 'status': 'SUCCEEDED'})
+
+        # Mocking the client.actor() method
+        def side_effect(actor_id):
+            if actor_id == 'apify/twitter-scraper-lite':
+                return mock_actor_success
+            return mock_actor_fail
+
+        mock_client.actor.side_effect = side_effect
+
+        # Mocking dataset items
+        mock_dataset = MagicMock()
+        # The iterate_items method returns an object that has __aiter__
+        mock_iter = MagicMock()
+        mock_iter.__aiter__.return_value = [{'text': 'tweet from fallback'}]
+        mock_dataset.iterate_items.return_value = mock_iter
+        mock_client.dataset.return_value = mock_dataset
+
+        tweets = await scraper.fetch_via_apify(limit=10)
+
+        assert len(tweets) == 1
+        assert tweets[0]['text'] == 'tweet from fallback'
+        assert mock_client.actor.call_count >= 2
+
+@pytest.mark.asyncio
 async def test_get_deep_dive(mock_twikit_client):
     scraper = TwitterScraper()
 
